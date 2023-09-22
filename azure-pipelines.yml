@@ -3,8 +3,7 @@
 # Add steps that run tests, create a NuGet package, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 
-trigger:
-- main
+trigger: none
 
 pool:
   vmImage: ubuntu-latest
@@ -26,6 +25,7 @@ steps:
     projects: '**/WebApp.csproj'
 
 - task: DotNetCoreCLI@2
+  displayName: build the app
   inputs:
     command: 'build'
     projects: '**/WebApp.csproj'
@@ -33,12 +33,14 @@ steps:
 
 
 - task: DotNetCoreCLI@2
+  displayName: unit tests
   inputs:
     command: 'test'
     projects: '**/UnitTest*.csproj'
     arguments: '-configuration $(BuildConfiguration)'
 
 - task: DotNetCoreCLI@2
+  displayName: publish the project
   inputs:
     command: 'publish'
     publishWebProjects: true
