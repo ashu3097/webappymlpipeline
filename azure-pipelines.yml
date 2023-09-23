@@ -3,10 +3,11 @@ trigger: 'none' # will disable CI builds entirely
 pr: none
 # - master
 # - releases/*
-
-jobs:
-- job: WebApp
-  displayName: 'Build Web App'
+stages:
+- stage : build webapp
+  jobs:
+-  job: WebApp
+   displayName: 'Build Web App'
   pool:
     vmImage: 'windows-2019'
   variables:
@@ -50,7 +51,7 @@ jobs:
       SonarCloud: 'sonardemo'
       organization: 'ashusharma897'
       scannerMode: 'MSBuild'
-      projectKey: 'webapp-databasedemo'
+      projectKey: 'WebApp'
   
   - task: DotNetCoreCLI@2
     displayName: Build
@@ -87,7 +88,9 @@ jobs:
     inputs:
       PathtoPublish: '$(build.artifactstagingdirectory)'
 
-- job: Database
+ -stage: B
+  dependsOn : build webapp
+ - job: Database
   displayName: 'Build Database'
   pool:
     vmImage: 'windows-2019'
@@ -106,7 +109,7 @@ jobs:
       ArtifactName: 'dacpac'
       publishLocation: 'Container'
 
-- job: Selenium
+ - job: Selenium
   displayName: 'Build UI Tests'
   pool:
     vmImage: 'windows-2019'
