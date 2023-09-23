@@ -50,8 +50,8 @@ stages:
         SonarCloud: 'sonardemo'
         organization: 'ashusharma897'
         scannerMode: 'MSBuild'
-        projectKey: 'Webapp'
-        projectName: 'Webapp'
+        projectKey: 'ashusharmaa897'
+        projectName: 'ashusharmaa897'
   
     - task: DotNetCoreCLI@2
       displayName: Build
