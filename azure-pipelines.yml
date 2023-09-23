@@ -1,113 +1,114 @@
-trigger: 'none' # will disable CI builds entirely
-# - master
+trigger:
+- none
+
 pr: none
-# - master
-# - releases/*
+
 pool:
-    vmImage: 'windows-2019'
+  vmImage: 'windows-2019'
+
 stages:
-- stage : build webapp
+- stage: BuildWebApp
   jobs:
--  job: WebApp
-   displayName: 'Build Web App'
-  
-  steps:
-  
-  - task: UseDotNet@2
-    displayName: Install .NET 6 sdk
-    inputs:
-      packageType: sdk
-      version: 6.0.x
-      installationPath: $(Agent.ToolsDirectory)/dotnet
+  - job: WebApp
+    displayName: 'Build Web App'
 
-  - task: DotNetCoreCLI@2
-    displayName: Restore
-    inputs:
-      command: restore
-      projects: '**/WebApp.csproj'
-  
-  - powershell: |
-     $paths = Get-ChildItem -include *.csproj -Recurse
-     foreach($pathobject in $paths) 
-     {
-         $path = $pathobject.fullname
-         $doc = New-Object System.Xml.XmlDocument
-         $doc.Load($path)
-         $child = $doc.CreateElement("ProjectGuid")
-         $child.InnerText = [guid]::NewGuid().ToString().ToUpper()
-         $node = $doc.SelectSingleNode("//Project/PropertyGroup")
-         $node.AppendChild($child)
-         $doc.Save($path)
-     }
-    workingDirectory: WebApp
-    displayName: 'PS : Add Project GUID'
-    enabled: false
-  
-  - task: SonarCloudPrepare@1
-    displayName: 'Prepare analysis on SonarCloud'
-    inputs:
-      SonarCloud: 'sonardemo'
-      organization: 'ashusharma897'
-      scannerMode: 'MSBuild'
-      projectKey: 'WebApp'
-  
-  - task: DotNetCoreCLI@2
-    displayName: Build
-    inputs:
-      projects: '**/WebApp.csproj'
-      arguments: '--configuration $(BuildConfiguration)'
-  
-  - task: DotNetCoreCLI@2
-    displayName: Test
-    inputs:
-      command: 'test'
-      projects: '**/*UnitTest*.csproj'
-      arguments: '--configuration $(BuildConfiguration)'
-  
-  - task: DotNetCoreCLI@2
-    displayName: Publish
-    inputs:
-      command: 'publish'
-      publishWebProjects: true
-      arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
-  
-  - task: SonarCloudAnalyze@1
-    inputs:
-      jdkversion: 'JAVA_HOME_17_X64'
-    displayName: 'Run Code Analysis'
-  
-  - task: SonarCloudPublish@1
-    inputs:
-      pollingTimeoutSec: '300'
-    displayName: 'Publish Quality Gate Result'
-  
-  - task: PublishBuildArtifacts@1
-    displayName: 'Publish Artifact (WebApp.zip)'
-    inputs:
-      PathtoPublish: '$(build.artifactstagingdirectory)'
+    steps:
+    - task: UseDotNet@2
+      displayName: Install .NET 6 sdk
+      inputs:
+        packageType: sdk
+        version: 6.0.x
+        installationPath: $(Agent.ToolsDirectory)/dotnet
 
- -stage: B
-  dependsOn : build webapp
- - job: Database
-  displayName: 'Build Database'
-  pool:
-    vmImage: 'windows-2019'
+    - task: DotNetCoreCLI@2
+      displayName: Restore
+      inputs:
+        command: restore
+        projects: '**/WebApp.csproj'
 
-  steps:
-  - task: MSBuild@1
-    displayName: 'Build solution WebApp.Database.sqlproj'
-    inputs:
-      solution: 'WebApp.Database/WebApp.Database.sqlproj'
-      msbuildArguments: '/p:OutDir=$(Build.ArtifactStagingDirectory)'
-  
-  - task: PublishBuildArtifacts@1
-    displayName: 'Publish Artifact (Dacpac)'
-    inputs:
-      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-      ArtifactName: 'dacpac'
-      publishLocation: 'Container'
+    - powershell: |
+        $paths = Get-ChildItem -include *.csproj -Recurse
+        foreach($pathobject in $paths) 
+        {
+            $path = $pathobject.fullname
+            $doc = New-Object System.Xml.XmlDocument
+            $doc.Load($path)
+            $child = $doc.CreateElement("ProjectGuid")
+            $child.InnerText = [guid]::NewGuid().ToString().ToUpper()
+            $node = $doc.SelectSingleNode("//Project/PropertyGroup")
+            $node.AppendChild($child)
+            $doc.Save($path)
+        }
+      workingDirectory: $(Build.SourcesDirectory)/WebApp  # Corrected working directory
+      displayName: 'PS : Add Project GUID'
+      enabled: false
 
- - job: Selenium
+    - task: SonarCloudPrepare@1
+      displayName: 'Prepare analysis on SonarCloud'
+      inputs:
+        SonarCloud: 'sonardemo'
+        organization: 'ashusharma897'
+        scannerMode: 'MSBuild'
+        projectKey: 'WebApp'
+
+    - task: DotNetCoreCLI@2
+      displayName: Build
+      inputs:
+        projects: '**/WebApp.csproj'
+        arguments: '--configuration $(BuildConfiguration)'
+
+    - task: DotNetCoreCLI@2
+      displayName: Test
+      inputs:
+        command: 'test'
+        projects: '**/*UnitTest*.csproj'
+        arguments: '--configuration $(BuildConfiguration)'
+
+    - task: DotNetCoreCLI@2
+      displayName: Publish
+      inputs:
+        command: 'publish'
+        publishWebProjects: true
+        arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
+
+    - task: SonarCloudAnalyze@1
+      inputs:
+        jdkVersion: 'JAVA_HOME_17_X64'  # Corrected jdkVersion
+      displayName: 'Run Code Analysis'
+
+    - task: SonarCloudPublish@1
+      inputs:
+        pollingTimeoutSec: '300'
+      displayName: 'Publish Quality Gate Result'
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact (WebApp.zip)'
+      inputs:
+        PathtoPublish: '$(build.artifactstagingdirectory)'
+
+- stage: B
+  dependsOn: BuildWebApp  # Corrected indentation
+  jobs:
+  - job: Database
+    displayName: 'Build Database'
+    pool:
+      vmImage: 'windows-2019'
+
+    steps:
+    - task: MSBuild@1
+      displayName: 'Build solution WebApp.Database.sqlproj'
+      inputs:
+        solution: 'WebApp.Database/WebApp.Database.sqlproj'
+        msbuildArguments: '/p:OutDir=$(Build.ArtifactStagingDirectory)'
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact (Dacpac)'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'dacpac'
+        publishLocation: 'Container'
+
+  - job: Selenium
   displayName: 'Build UI Tests'
   pool:
     vmImage: 'windows-2019'
@@ -136,6 +137,7 @@ stages:
   displayName: 'Copy Infrastructure files (ARM)'
   pool:
     vmImage: 'ubuntu-latest'
+
   steps:
   - task: PublishBuildArtifacts@1
     displayName: 'Publish Artifact: ARM templates'
