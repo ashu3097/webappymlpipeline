@@ -47,9 +47,11 @@ stages:
     - task: SonarCloudPrepare@1
       displayName: 'Prepare analysis on SonarCloud'
       inputs:
-        SonarCloud: SonarCloud
-        organization: houssemdellai
-        projectKey: WebAppWithDatabaseDemo
+        SonarCloud: 'sonardemo'
+        organization: 'ashusharma897'
+        scannerMode: 'MSBuild'
+        projectKey: 'webapp-databasedemo'
+        projectName: 'webapp-databasedemo'
   
     - task: DotNetCoreCLI@2
       displayName: Build
