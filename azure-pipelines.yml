@@ -50,7 +50,7 @@ jobs:
       SonarCloud: 'sonardemo'
       organization: 'ashusharma897'
       scannerMode: 'MSBuild'
-      projectKey: 'WebAppWithDatabaseDemo001'
+      projectKey: 'webapp-databasedemo'
   
   - task: DotNetCoreCLI@2
     displayName: Build
