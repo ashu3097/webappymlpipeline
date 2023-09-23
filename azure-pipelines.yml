@@ -8,8 +8,8 @@ stages:
   jobs:
 -  job: WebApp
    displayName: 'Build Web App'
-  pool:
-    vmImage: 'windows-2019'
+pool:
+vmImage: 'windows-2019'
   variables:
     BuildConfiguration: release
   
