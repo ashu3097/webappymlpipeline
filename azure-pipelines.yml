@@ -3,13 +3,14 @@ trigger: 'none' # will disable CI builds entirely
 pr: none
 # - master
 # - releases/*
+pool:
+    vmImage: 'windows-2019'
 stages:
 - stage : build webapp
   jobs:
 -  job: WebApp
    displayName: 'Build Web App'
-pool:
-vmImage: 'windows-2019'
+
   variables:
     BuildConfiguration: release
   
