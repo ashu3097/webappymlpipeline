@@ -10,9 +10,6 @@ stages:
   jobs:
 -  job: WebApp
    displayName: 'Build Web App'
-
-  variables:
-    BuildConfiguration: release
   
   steps:
   
