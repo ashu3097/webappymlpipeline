@@ -48,10 +48,10 @@ stages:
       displayName: 'Prepare analysis on SonarCloud'
       inputs:
         SonarCloud: 'sonardemo'
-        organization: 'ashusharma897'
+        organization: 'dbsonar'
         scannerMode: 'MSBuild'
-        projectKey: 'ashusharmaa897'
-        projectName: 'ashusharmaa897'
+        projectKey: 'e771d00f822af1e5edb8cb60fc87304196f339b4'
+        projectName: 'webappsonar'
   
     - task: DotNetCoreCLI@2
       displayName: Build
