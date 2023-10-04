@@ -47,7 +47,7 @@ stages:
     - task: SonarCloudPrepare@1
       displayName: 'Prepare analysis on SonarCloud'
       inputs:
-        SonarCloud: 'sonardemo'
+        SonarCloud: 'mysonar'
         organization: 'dbsonar'
         scannerMode: 'MSBuild'
         projectKey: 'e771d00f822af1e5edb8cb60fc87304196f339b4'
