@@ -48,9 +48,9 @@ stages:
       displayName: 'Prepare analysis on SonarCloud'
       inputs:
         SonarCloud: 'mysonar'
-        organization: 'dbsonar'
+        organization: 'ashusharmaa897'
         scannerMode: 'MSBuild'
-        projectKey: 'webappymlpipeline'
+        projectKey: 'ashusharmaa897'
         projectName: 'webappsonar'
   
     - task: DotNetCoreCLI@2
